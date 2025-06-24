@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COMMIT TO THE BITS - Retro Word Processor</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono:wght@400&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Share Tech Mono', monospace;
+            background: #e8e8e8;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .word-processor {
+            max-width: 900px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #c8c8c8, #a8a8a8);
+            border: 4px solid #999;
+            border-radius: 12px;
+            box-shadow: 
+                0 8px 20px rgba(0,0,0,0.3),
+                inset 0 2px 4px rgba(255,255,255,0.3);
+            margin-bottom: 30px;
+        }
+        
+        .top-panel {
+            background: linear-gradient(145deg, #d8d8d8, #c8c8c8);
+            padding: 15px;
+            border-bottom: 2px solid #aaa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .brand {
+            font-size: 16px;
+            color: #444;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+        
+        .model {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .lcd-display {
+            background: #2d4a2d;
+            border: 3px inset #888;
+            margin: 10px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            position: relative;
+        }
+        
+        .lcd-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    transparent,
+                    transparent 2px,
+                    rgba(170,255,85,0.03) 2px,
+                    rgba(170,255,85,0.03) 4px
+                );
+            pointer-events: none;
+            border-radius: 5px;
+        }
+        
+        .title-bar {
+            text-align: center;
+            font-size: 18px;
+            color: #aaff55;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px #aaff55;
+            animation: pulse-glow 2s infinite alternate;
+        }
+        
+        @keyframes pulse-glow {
+            0% { text-shadow: 0 0 10px #aaff55; }
+            100% { text-shadow: 0 0 15px #aaff55, 0 0 20px #aaff55; }
+        }
+        
+        .subtitle {
+            text-align: center;
+            font-size: 10px;
+            color: #88cc44;
+            margin-bottom: 20px;
+            opacity: 0.8;
+        }
+        
+        .status-line {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            color: #88cc44;
+            margin-bottom: 15px;
+            padding: 5px 0;
+            border-bottom: 1px solid #445544;
+        }
+        
+        .buffer-section {
+            border: 1px dashed #aaff55;
+            border-radius: 4px;
+            padding: 15px;
+            background: rgba(170,255,85,0.05);
+        }
+        
+        .progress-container {
+            margin-bottom: 10px;
+            background: #223322;
+            border: 1px solid #445544;
+            height: 12px;
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #66aa22, #aaaa22, #aa4422);
+            border-radius: 1px;
+            transition: width 0.1s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+            font-size: 8px;
+            font-weight: bold;
+            position: relative;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #aaff55;
+            font-size: 8px;
+            z-index: 2;
+            text-shadow: 1px 1px 2px #000;
+        }
+        
+        .buffer-textarea {
+            width: 100%;
+            height: 100px;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #aaff55;
+            resize: none;
+            overflow-y: auto;
+            text-shadow: 0 0 3px #aaff55;
+        }
+        
+        .buffer-textarea::placeholder {
+            color: #668844;
+            opacity: 0.7;
+        }
+        
+        .control-panel {
+            background: linear-gradient(145deg, #c8c8c8, #a8a8a8);
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 2px solid #aaa;
+            gap: 15px;
+        }
+        
+        .status-indicators {
+            display: flex;
+            gap: 15px;
+            font-size: 10px;
+            color: #333;
+            font-weight: bold;
+        }
+        
+        .warning-display {
+            color: #cc6600;
+            font-size: 10px;
+            min-height: 12px;
+            animation: blink 1s infinite;
+            font-weight: bold;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .function-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn {
+            background: linear-gradient(145deg, #d8d8d8, #c8c8c8);
+            border: 2px outset #999;
+            color: #444;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 10px;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+        }
+        
+        .btn:hover {
+            background: linear-gradient(145deg, #e8e8e8, #d8d8d8);
+        }
+        
+        .btn:active {
+            border: 2px inset #999;
+            background: linear-gradient(145deg, #c8c8c8, #d8d8d8);
+        }
+        
+        .commit-flash {
+            animation: commit-animation 0.5s ease;
+        }
+        
+        @keyframes commit-animation {
+            0% { background: rgba(170,255,85,0.05); }
+            50% { background: rgba(255,220,85,0.2); }
+            100% { background: rgba(170,255,85,0.05); }
+        }
+        
+        .dot-matrix {
+            background-image: 
+                radial-gradient(circle at center, #aaff55 0.5px, transparent 0.5px);
+            background-size: 3px 3px;
+            opacity: 0.1;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+        }
+        
+        /* Paper Canvas Below */
+        .paper-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #f8f8f8;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            min-height: 400px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .paper-header {
+            background: #f0f0f0;
+            padding: 10px 20px;
+            border-bottom: 1px solid #ddd;
+            font-family: 'Courier Prime', monospace;
+            font-size: 12px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .continuous-paper {
+            background: #ffffff;
+            position: relative;
+            min-height: 350px;
+            margin: 0 30px;
+            border-left: 1px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        .tractor-holes-left {
+            position: absolute;
+            left: -15px;
+            top: 0;
+            bottom: 0;
+            width: 30px;
+            background: 
+                repeating-linear-gradient(
+                    to bottom,
+                    #f8f8f8 0px,
+                    #f8f8f8 8px,
+                    transparent 8px,
+                    transparent 16px
+                ),
+                radial-gradient(circle at 15px 8px, #333 2px, transparent 2px),
+                radial-gradient(circle at 15px 24px, #333 2px, transparent 2px),
+                radial-gradient(circle at 15px 40px, #333 2px, transparent 2px),
+                radial-gradient(circle at 15px 56px, #333 2px, transparent 2px);
+            background-size: 
+                30px 16px,
+                30px 16px,
+                30px 16px,
+                30px 16px,
+                30px 16px;
+            background-repeat: repeat-y;
+        }
+        
+        .tractor-holes-right {
+            position: absolute;
+            right: -15px;
+            top: 0;
+            bottom: 0;
+            width: 30px;
+            background: 
+                repeating-linear-gradient(
+                    to bottom,
+                    #f8f8f8 0px,
+                    #f8f8f8 8px,
+                    transparent 8px,
+                    transparent 16px
+                ),
+                radial-gradient(circle at 15px 8px, #333 2px, transparent 2px),
+                radial-gradient(circle at 15px 24px, #333 2px, transparent 2px),
+                radial-gradient(circle at 15px 40px, #333 2px, transparent 2px),
+                radial-gradient(circle at 15px 56px, #333 2px, transparent 2px);
+            background-size: 
+                30px 16px,
+                30px 16px,
+                30px 16px,
+                30px 16px,
+                30px 16px;
+            background-repeat: repeat-y;
+        }
+        
+        .paper-content {
+            padding: 30px 40px;
+            font-family: 'Courier Prime', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #222;
+            min-height: 320px;
+            white-space: pre-wrap;
+            background: 
+                repeating-linear-gradient(
+                    to bottom,
+                    transparent 0px,
+                    transparent 23px,
+                    #f0f0f0 23px,
+                    #f0f0f0 24px
+                );
+        }
+        
+        .perforated-edge-top {
+            height: 8px;
+            background: 
+                repeating-linear-gradient(
+                    to right,
+                    #f8f8f8 0px,
+                    #f8f8f8 4px,
+                    #e0e0e0 4px,
+                    #e0e0e0 5px
+                );
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        .perforated-edge-bottom {
+            height: 8px;
+            background: 
+                repeating-linear-gradient(
+                    to right,
+                    #f8f8f8 0px,
+                    #f8f8f8 4px,
+                    #e0e0e0 4px,
+                    #e0e0e0 5px
+                );
+            border-top: 1px dashed #ccc;
+        }
+    </style>
+</head>
+<body>
+    <!-- LCD Interface -->
+    <div class="word-processor">
+        <div class="top-panel">
+            <div class="brand">COMMIT-O-TRON 5000</div>
+            <div class="model">MG-2025 PROCESSOR</div>
+        </div>
+        
+        <div class="lcd-display">
+            <div class="lcd-overlay"></div>
+            <div class="dot-matrix"></div>
+            
+            <div class="title-bar">═══ COMMIT TO THE BITS ═══</div>
+            <div class="subtitle">CHARACTER-BASED COMMITMENT SYSTEM v1.0</div>
+            
+            <div class="status-line">
+                <span>MODE: EDIT</span>
+                <span>BUFFER: ACTIVE</span>
+                <span>PITCH: 12 CPI</span>
+                <span>LINE: AUTO</span>
+            </div>
+            
+            <div class="buffer-section" id="bufferSection">
+                <div class="progress-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                    <div class="progress-text" id="progressText">0/250</div>
+                </div>
+                <textarea 
+                    class="buffer-textarea" 
+                    id="bufferText" 
+                    placeholder="▌ BUFFER READY - 250 CHARS AVAILABLE"
+                    spellcheck="false"
+                    maxlength="500"
+                ></textarea>
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <div class="status-indicators">
+                <div id="charCounter">CHARS: 0/250</div>
+                <div id="wordCounter">WORDS: 0</div>
+                <div id="commitStatus">BUFFER: READY</div>
+            </div>
+            <div class="warning-display" id="warningText"></div>
+            <div class="function-buttons">
+                <button class="btn" onclick="manualCommit()">F1: COMMIT</button>
+                <button class="btn" onclick="copyAllText()">F2: COPY</button>
+                <button class="btn" onclick="clearBuffer()">F3: CLEAR</button>
+                <button class="btn" onclick="showHelp()">F4: HELP</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paper Output -->
+    <div class="paper-container">
+        <div class="paper-header">
+            <span>CONTINUOUS FEED PRINTER OUTPUT</span>
+            <span id="pageInfo">Form Feed Ready</span>
+        </div>
+        <div class="perforated-edge-top"></div>
+        <div class="continuous-paper">
+            <div class="tractor-holes-left"></div>
+            <div class="tractor-holes-right"></div>
+            <div class="paper-content" id="paperText"></div>
+        </div>
+        <div class="perforated-edge-bottom"></div>
+    </div>
+
+    <script>
+        const bufferTextarea = document.getElementById('bufferText');
+        const paperDiv = document.getElementById('paperText');
+        const charCounter = document.getElementById('charCounter');
+        const wordCounter = document.getElementById('wordCounter');
+        const commitStatus = document.getElementById('commitStatus');
+        const warningText = document.getElementById('warningText');
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+        const bufferSection = document.getElementById('bufferSection');
+        
+        let committedText = '';
+        const MAX_CHARS = 250;
+        
+        function countWords(text) {
+            if (!text || text.trim() === '') return 0;
+            return text.trim().split(/\s+/).length;
+        }
+        
+        function updateStatus() {
+            const bufferContent = bufferTextarea.value;
+            const charCount = bufferContent.length;
+            const percentage = (charCount / MAX_CHARS) * 100;
+            const committedWords = countWords(committedText);
+            
+            // Update counters
+            charCounter.textContent = `CHARS: ${charCount}/${MAX_CHARS}`;
+            wordCounter.textContent = `WORDS: ${committedWords}`;
+            progressText.textContent = `${charCount}/${MAX_CHARS}`;
+            
+            // Update progress bar
+            progressBar.style.width = `${Math.min(percentage, 100)}%`;
+            
+            // Update status and warnings
+            if (charCount === 0) {
+                commitStatus.textContent = 'BUFFER: READY';
+                warningText.textContent = '';
+            } else if (charCount < 200) {
+                commitStatus.textContent = 'BUFFER: ACTIVE';
+                warningText.textContent = '';
+            } else if (charCount < 240) {
+                commitStatus.textContent = 'BUFFER: WARN';
+                const remaining = MAX_CHARS - charCount;
+                warningText.textContent = `⚠ ${remaining} CHARS TO COMMIT`;
+            } else if (charCount < MAX_CHARS) {
+                commitStatus.textContent = 'BUFFER: CRITICAL';
+                const remaining = MAX_CHARS - charCount;
+                warningText.textContent = `⚠ COMMIT IN ${remaining} CHARS!`;
+            }
+            
+            // Auto-commit when limit exceeded
+            if (charCount > MAX_CHARS) {
+                commitText(bufferContent);
+            }
+        }
+        
+        function commitText(fullText) {
+            const textToCommit = fullText.substring(0, MAX_CHARS);
+            const remainingText = fullText.substring(MAX_CHARS);
+            
+            // Add to committed document (both LCD display and paper)
+            if (textToCommit.trim() || textToCommit.length > 0) {
+                committedText += textToCommit;
+                paperDiv.textContent = committedText;
+            }
+            
+            // Update buffer
+            bufferTextarea.value = remainingText;
+            
+            // Visual feedback
+            bufferSection.classList.add('commit-flash');
+            commitStatus.textContent = 'COMMITTED!';
+            progressText.textContent = 'COMMIT!';
+            warningText.textContent = '*** TEXT COMMITTED TO DOCUMENT ***';
+            
+            // Play a subtle "commit" effect
+            setTimeout(() => {
+                bufferSection.classList.remove('commit-flash');
+                updateStatus();
+            }, 500);
+        }
+        
+        function manualCommit() {
+            const bufferContent = bufferTextarea.value;
+            if (bufferContent.trim().length > 0) {
+                // Commit whatever is currently in the buffer
+                committedText += bufferContent;
+                paperDiv.textContent = committedText;
+                
+                // Clear buffer
+                bufferTextarea.value = '';
+                
+                // Visual feedback
+                bufferSection.classList.add('commit-flash');
+                commitStatus.textContent = 'MANUAL COMMIT!';
+                progressText.textContent = 'DONE!';
+                warningText.textContent = '*** MANUAL COMMIT EXECUTED ***';
+                
+                setTimeout(() => {
+                    bufferSection.classList.remove('commit-flash');
+                    updateStatus();
+                    bufferTextarea.focus();
+                }, 500);
+            }
+        }
+        
+        function copyAllText() {
+            const allText = committedText + bufferTextarea.value;
+            
+            navigator.clipboard.writeText(allText).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'F2: COPIED!';
+                btn.style.background = 'linear-gradient(145deg, #c8e8c8, #a8d8a8)';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '';
+                }, 1000);
+            }).catch(() => {
+                alert('COPY FAILED - SELECT AND COPY MANUALLY');
+            });
+        }
+        
+        function clearBuffer() {
+            if (bufferTextarea.value.length > 0) {
+                if (confirm('CLEAR BUFFER? (UNCOMMITTED TEXT WILL BE LOST)')) {
+                    bufferTextarea.value = '';
+                    updateStatus();
+                    bufferTextarea.focus();
+                }
+            }
+        }
+        
+        function showHelp() {
+            alert('COMMIT TO THE BITS v1.0\n\nTYPE IN BUFFER AREA\nMAX 250 CHARACTERS\nTEXT COMMITS AUTOMATICALLY\nF1: MANUAL COMMIT\nF2: COPY ALL TEXT\nF3: CLEAR BUFFER\nF4: THIS HELP');
+        }
+        
+        // Event listeners
+        bufferTextarea.addEventListener('input', updateStatus);
+        bufferTextarea.addEventListener('keydown', function(e) {
+            setTimeout(updateStatus, 0);
+        });
+        
+        // Simulate old computer startup
+        setTimeout(() => {
+            bufferTextarea.focus();
+            updateStatus();
+        }, 100);
+        
+        // Initialize
+        updateStatus();
+    </script>
+</body>
+</html>
